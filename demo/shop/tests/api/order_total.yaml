@@ -1,0 +1,37 @@
+name: Order total is quantity times price
+description: >
+  As a customer ordering two bags, I am charged 2 x 42.50 = 85.00, and that is what the
+  API returns, what the database stores, and what my order history shows.
+tags: [orders, money]
+fixtures: [customer]
+steps:
+  - name: place an order for two bags
+    call: POST /orders
+    body:
+      customerId: "${fixture.customer.id}"
+      channel: mobile
+      items: [{ sku: BAG-1, qty: 2 }]
+    expect:
+      status: 201
+      json:
+        "$.total": 85.0
+        "$.items[0].qty": 2
+    save: { orderId: "$.id" }
+
+  - name: the database stores 85.00
+    db: SELECT total FROM orders WHERE id = :orderId
+    params: { orderId: "${orderId}" }
+    expect: { rows: 1, row: { total: 85.0 } }
+
+  - name: order history shows 85.00
+    call: GET /orders
+    query: { customerId: "${fixture.customer.id}" }
+    expect:
+      status: 200
+      json: { "$[0].total": 85.0 }
+
+cleanup:
+  - db: DELETE FROM order_items WHERE order_id = :orderId
+    params: { orderId: "${orderId}" }
+  - db: DELETE FROM orders WHERE id = :orderId
+    params: { orderId: "${orderId}" }

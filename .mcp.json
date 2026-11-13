@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "api-functional-qa": {
+      "command": "uvx",
+      "args": [
+        "k11-api-functional-qa-mcp"
+      ]
+    }
+  }
+}

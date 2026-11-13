@@ -1,0 +1,57 @@
+name: Customer cancels an order and it is soft-deleted
+description: >
+  As a customer, I can cancel an order. The order shows as cancelled, and in the database
+  it is kept (soft delete) with a deleted_at timestamp.
+tags: [orders, smoke]
+fixtures: [customer]
+steps:
+  - name: place an order
+    call: POST /orders
+    body:
+      customerId: "${fixture.customer.id}"
+      channel: web
+      items: [{ sku: HAT-2, qty: 1 }]
+    expect:
+      status: 201
+      json:
+        "$.status": pending
+        "$.total": 15.0
+        "$.items": { length: 1 }
+    save: { orderId: "$.id" }
+
+  - name: the order is stored as pending
+    db: SELECT status, total, deleted_at FROM orders WHERE id = :orderId
+    params: { orderId: "${orderId}" }
+    expect:
+      rows: 1
+      row: { status: pending, total: 15.0, deleted_at: { eq: null } }
+
+  - name: cancel it
+    call: DELETE /orders/{id}
+    path: { id: "${orderId}" }
+    expect: { status: 204 }
+
+  - name: the API shows it as cancelled
+    call: GET /orders/{id}
+    path: { id: "${orderId}" }
+    expect:
+      status: 200
+      json: { "$.status": cancelled }
+
+  - name: the row is kept and marked deleted
+    db: SELECT status, deleted_at FROM orders WHERE id = :orderId
+    params: { orderId: "${orderId}" }
+    expect:
+      rows: 1
+      row: { status: cancelled, deleted_at: { exists: true, ne: null } }
+
+  - name: cancelling again returns 404
+    call: DELETE /orders/{id}
+    path: { id: "${orderId}" }
+    expect: { status: 404 }
+
+cleanup:
+  - db: DELETE FROM order_items WHERE order_id = :orderId
+    params: { orderId: "${orderId}" }
+  - db: DELETE FROM orders WHERE id = :orderId
+    params: { orderId: "${orderId}" }

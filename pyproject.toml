@@ -1,0 +1,44 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "k11-api-functional-qa-mcp"
+version = "0.1.0"
+description = "MCP server and Claude Code plugin for functional API testing: user stories to multi-step API test flows, negative and boundary tests from the spec, database checks and fixtures, with evidence for every step."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "K11 Software Solutions" }]
+requires-python = ">=3.10"
+keywords = ["mcp", "api-testing", "functional-testing", "rest", "openapi", "database-testing", "negative-testing", "qa", "claude"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3",
+  "Topic :: Software Development :: Testing",
+]
+dependencies = ["k11-api-contract-qa-mcp>=0.1.0"]
+
+[project.optional-dependencies]
+postgres = ["psycopg[binary]>=3.1"]
+mysql = ["pymysql>=1.1"]
+mssql = ["pymssql>=2.3"]
+dev = ["pytest>=8", "pytest-timeout>=2"]
+
+[project.urls]
+Homepage = "https://github.com/K11-Software-Solutions/k11techlab-api-functional-qa-mcp"
+Issues = "https://github.com/K11-Software-Solutions/k11techlab-api-functional-qa-mcp/issues"
+
+[project.scripts]
+k11-api-functional-qa-mcp = "k11_api_qa.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/k11_api_qa"]
+
+[tool.hatch.build.targets.sdist]
+include = ["src", "README.md", "LICENSE"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+timeout = 120

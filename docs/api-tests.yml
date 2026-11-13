@@ -1,0 +1,47 @@
+# Copy to .github/workflows/api-tests.yml in your service's repository.
+#
+# Runs the API test flows in tests/api/ against a test environment on every pull request,
+# posts the report as a PR comment and publishes JUnit results.
+name: API functional tests
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+
+jobs:
+  api-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install "k11-api-functional-qa-mcp[postgres]"
+
+      # Start your service and its test database here (docker compose, a preview deployment, ...).
+
+      - name: Run API flows
+        id: api
+        run: k11-api-functional-qa-mcp run --env staging --fail-on never
+        env:
+          API_TOKEN: ${{ secrets.STAGING_API_TOKEN }}
+          TEST_DB_URL: ${{ secrets.STAGING_TEST_DB_URL }}
+
+      - name: Comment on the pull request
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: api-functional-tests
+          path: ${{ steps.api.outputs.report }}
+
+      - name: Publish JUnit results
+        uses: mikepenz/action-junit-report@v5
+        with:
+          report_paths: ${{ steps.api.outputs.junit }}
+
+      - name: Fail if any flow failed
+        if: steps.api.outputs.failed != '0' || steps.api.outputs.blocked != '0' || steps.api.outputs.errors != '0'
+        run: exit 1

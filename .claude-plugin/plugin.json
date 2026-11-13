@@ -1,0 +1,22 @@
+{
+  "name": "api-functional-qa",
+  "version": "0.1.0",
+  "description": "Functional API testing from Claude Code: user stories to multi-step API test flows, negative and boundary tests from the spec, database checks and fixtures, with evidence for every step.",
+  "author": {
+    "name": "Kavita A. Jadhav",
+    "url": "https://k11softwaresolutions.com"
+  },
+  "homepage": "https://github.com/K11-Software-Solutions/k11techlab-api-functional-qa-mcp",
+  "repository": "https://github.com/K11-Software-Solutions/k11techlab-api-functional-qa-mcp",
+  "license": "MIT",
+  "keywords": [
+    "api-testing",
+    "functional-testing",
+    "rest",
+    "openapi",
+    "database-testing",
+    "negative-testing",
+    "qa",
+    "mcp"
+  ]
+}

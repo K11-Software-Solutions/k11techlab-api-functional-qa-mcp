@@ -1,0 +1,30 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.K11-Software-Solutions/api-functional-qa",
+  "title": "k11 API Functional QA",
+  "description": "Functional API tests: story-to-flow, negative tests from the spec, DB checks, evidence.",
+  "websiteUrl": "https://github.com/K11-Software-Solutions/k11techlab-api-functional-qa-mcp",
+  "repository": {
+    "url": "https://github.com/K11-Software-Solutions/k11techlab-api-functional-qa-mcp",
+    "source": "github"
+  },
+  "version": "0.1.0",
+  "packages": [
+    {
+      "registryType": "pypi",
+      "identifier": "k11-api-functional-qa-mcp",
+      "version": "0.1.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "QA_MCP_ROOT",
+          "description": "Folder with tests/api/ and .qa-mcp/api-test.yaml",
+          "isRequired": false,
+          "format": "string"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "name": "k11-api-functional-qa",
+  "owner": {
+    "name": "K11 Software Solutions",
+    "url": "https://k11softwaresolutions.com"
+  },
+  "plugins": [
+    {
+      "name": "api-functional-qa",
+      "source": "./",
+      "description": "Functional API tests with database checks, negative tests from the spec, and evidence."
+    }
+  ]
+}

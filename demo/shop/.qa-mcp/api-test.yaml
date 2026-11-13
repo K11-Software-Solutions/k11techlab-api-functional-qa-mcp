@@ -1,0 +1,25 @@
+spec: openapi.yaml
+default_environment: local
+environments:
+  local:
+    base_url: "${ENV:SHOP_URL}"
+  prod:
+    base_url: "${ENV:SHOP_URL}"      # same demo server, but named prod: data-changing calls are refused
+auth:
+  default:
+    type: bearer
+    token: "${ENV:SHOP_TOKEN}"
+databases:
+  main:
+    url: "sqlite:///shop.db"
+    allow_writes: true                # fixtures and cleanup only
+    mask: [email]
+fixtures:
+  customer:
+    db: main
+    insert:
+      table: customers
+      values: { id: "${uuid}", email: "${random_email}", name: Test Customer }
+    delete:
+      table: customers
+      where: { id: "${id}" }

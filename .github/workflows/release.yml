@@ -1,0 +1,62 @@
+name: Release
+
+# On a version tag (e.g. `git tag v0.1.0 && git push --tags`):
+#   1. check the tag matches pyproject.toml, __init__.py and server.json; run the tests
+#   2. build and publish to PyPI with Trusted Publishing (no token; the publisher is
+#      configured at pypi.org for this repository, workflow release.yml, environment pypi)
+#   3. publish the listing to the official MCP Registry (GitHub OIDC, no secret)
+on:
+  push:
+    tags: ["v*"]
+
+env:
+  MCP_PUBLISHER_VERSION: v1.8.9
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      contents: read
+      id-token: write # PyPI Trusted Publishing and MCP Registry login
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check versions match the tag
+        run: |
+          v="${GITHUB_REF_NAME#v}"
+          grep -q "^version = \"$v\"" pyproject.toml
+          grep -q "__version__ = \"$v\"" src/k11_api_qa/__init__.py
+          test "$(jq -r .version server.json)" = "$v"
+          test "$(jq -r '.packages[0].version' server.json)" = "$v"
+          test "$(jq -r .version .claude-plugin/plugin.json)" = "$v"
+      - run: pip install -e ".[dev]" build
+      - run: pytest -q
+      - run: python -m build
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          skip-existing: true
+
+      - name: Install cosign
+        uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6 # v4.1.2
+      - name: Download and verify mcp-publisher
+        run: |
+          set -euo pipefail
+          archive="mcp-publisher_linux_amd64.tar.gz"
+          base_url="https://github.com/modelcontextprotocol/registry/releases/download/${MCP_PUBLISHER_VERSION}"
+          curl --fail --location --silent --show-error --output "$archive" "$base_url/$archive"
+          curl --fail --location --silent --show-error --output "$archive.sigstore.json" "$base_url/$archive.sigstore.json"
+          cosign verify-blob \
+            --bundle "$archive.sigstore.json" \
+            --certificate-identity "https://github.com/modelcontextprotocol/registry/.github/workflows/release.yml@refs/tags/${MCP_PUBLISHER_VERSION}" \
+            --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
+            "$archive"
+          tar xzf "$archive" mcp-publisher
+      - name: Publish to the MCP Registry
+        run: |
+          ./mcp-publisher login github-oidc
+          for i in $(seq 1 12); do ./mcp-publisher publish && exit 0; echo "Retrying in 30s (PyPI may still be propagating)"; sleep 30; done
+          exit 1
