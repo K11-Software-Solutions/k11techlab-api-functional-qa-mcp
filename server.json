@@ -8,12 +8,12 @@
     "url": "https://github.com/K11-Software-Solutions/k11techlab-api-functional-qa-mcp",
     "source": "github"
   },
-  "version": "0.1.0",
+  "version": "0.1.1",
   "packages": [
     {
       "registryType": "pypi",
       "identifier": "k11-api-functional-qa-mcp",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "transport": {
         "type": "stdio"
       },

@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "k11-api-functional-qa-mcp"
-version = "0.1.0"
+version = "0.1.1"
 description = "MCP server and Claude Code plugin for functional API testing: user stories to multi-step API test flows, negative and boundary tests from the spec, database checks and fixtures, with evidence for every step."
 readme = "README.md"
 license = "MIT"

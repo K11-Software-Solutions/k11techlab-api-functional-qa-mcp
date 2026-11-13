@@ -1,6 +1,6 @@
 {
   "name": "api-functional-qa",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Functional API testing from Claude Code: user stories to multi-step API test flows, negative and boundary tests from the spec, database checks and fixtures, with evidence for every step.",
   "author": {
     "name": "Kavita A. Jadhav",

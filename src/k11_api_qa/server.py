@@ -204,6 +204,12 @@ def create_server() -> FastMCP:
 
 
 def serve() -> None:
+    import logging
+
+    # httpx logs every request URL at INFO; URLs can carry IDs or query-string secrets that our masking
+    # never sees, so keep it quiet. Evidence is reported, masked, through the tools instead.
+    for name in ("httpx", "httpcore"):
+        logging.getLogger(name).setLevel(logging.WARNING)
     create_server().run()
 
 
