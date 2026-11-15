@@ -1,0 +1,31 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using the metadata below."
+type: software
+title: "k11 API Functional QA MCP Server"
+abstract: "MCP server and Claude Code plugin for functional API testing: user stories to multi-step test flows with value checks, database checks that prove changes were stored, and negative and boundary tests generated from the specification, with guardrails that keep tests away from production data."
+authors:
+  - family-names: "Jadhav"
+    given-names: "Kavita"
+    orcid: "https://orcid.org/0009-0009-8507-4976"
+    affiliation: "K11 Software Solutions"
+repository-code: "https://github.com/K11-Software-Solutions/k11techlab-api-functional-qa-mcp"
+url: "https://github.com/K11-Software-Solutions/k11techlab-api-functional-qa-mcp"
+license: MIT
+keywords:
+  - "API testing"
+  - "functional testing"
+  - "database testing"
+  - "negative testing"
+  - "OpenAPI"
+  - "model context protocol"
+  - "quality engineering"
+references:
+  - type: article
+    title: "Autonomous CI/CD Quality Assurance Using LangGraph Multi-Agent Orchestration and Risk-Proportionate Human-in-the-Loop Control"
+    authors:
+      - family-names: "Jadhav"
+        given-names: "Kavita"
+        orcid: "https://orcid.org/0009-0009-8507-4976"
+    journal: "International Journal of Engineering and Computer Science"
+    year: 2026
+    doi: "10.18535/ijecs/v15i06.5563"

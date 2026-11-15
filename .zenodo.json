@@ -1,0 +1,36 @@
+{
+  "title": "k11 API Functional QA MCP Server",
+  "upload_type": "software",
+  "description": "<p>MCP server and Claude Code plugin for functional API testing: user stories to multi-step test flows with value checks, database checks that prove changes were stored, and negative and boundary tests generated from the specification, with guardrails that keep tests away from production data.</p><p>Source code: <a href=\"https://github.com/K11-Software-Solutions/k11techlab-api-functional-qa-mcp\">https://github.com/K11-Software-Solutions/k11techlab-api-functional-qa-mcp</a></p>",
+  "creators": [
+    {
+      "name": "Jadhav, Kavita",
+      "orcid": "0009-0009-8507-4976",
+      "affiliation": "K11 Software Solutions"
+    }
+  ],
+  "license": "MIT",
+  "access_right": "open",
+  "keywords": [
+    "API testing",
+    "functional testing",
+    "database testing",
+    "negative testing",
+    "OpenAPI",
+    "model context protocol",
+    "quality engineering"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/K11-Software-Solutions/k11techlab-api-functional-qa-mcp",
+      "relation": "isSupplementTo",
+      "resource_type": "software"
+    },
+    {
+      "identifier": "10.18535/ijecs/v15i06.5563",
+      "relation": "isSupplementTo",
+      "scheme": "doi",
+      "resource_type": "publication-article"
+    }
+  ]
+}
