@@ -109,7 +109,7 @@ def test_mcp_tools(project, shop):
             assert (info.serverInfo.name, info.serverInfo.version) == ("k11-api-functional-qa", __version__)
             names = sorted(t.name for t in (await c.list_tools()).tools)
             assert names == ["call_api", "draft_flow", "export_pytest", "generate_negative_tests", "list_environments",
-                             "query_db", "run_flows", "write_flow"]
+                             "query_db", "review_user_story", "run_flows", "write_flow"]
 
             def j(r):
                 assert not r.isError, r.content[0].text
@@ -119,6 +119,12 @@ def test_mcp_tools(project, shop):
             assert envs["environments"]["prod"]["writes"] is False and len(envs["flows"]) == 2
             d = j(await c.call_tool("draft_flow", {"story": "As a customer I want to place an order and see it in my order history"}))
             assert d["candidate_operations"][0]["endpoint"] in ("POST /orders", "GET /orders")
+            assert d["review"]["ready"] is False and "review_user_story" in d["review"]["note"]
+            rv = j(await c.call_tool("review_user_story", {"story": "As a customer, I want to cancel an order.\n"
+                                                           "Given I have an order\nWhen I send DELETE /refunds/{id}\n"
+                                                           "Then it is removed"}))
+            assert rv["ready"] is False and "wait" in rv["next"]
+            assert {"delete-semantics", "access", "spec-mismatch"} <= {q["kind"] for q in rv["questions"]}
             neg = j(await c.call_tool("generate_negative_tests", {"endpoint": "POST /orders",
                                                                    "base_values": {"customerId": "${fixture.customer.id}"},
                                                                    "fixtures": ["customer"]}))

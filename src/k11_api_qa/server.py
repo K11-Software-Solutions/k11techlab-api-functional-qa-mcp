@@ -10,7 +10,7 @@ from typing import Any, Optional
 import yaml
 from mcp.server.fastmcp import FastMCP
 
-from . import __version__, config, db, export, generate, report
+from . import __version__, clarify, config, db, export, generate, report
 from .runner import FlowError, Runner, flow_files, run_files, validate_flow
 
 
@@ -46,7 +46,8 @@ def create_server() -> FastMCP:
             "Functional API testing. Tests are YAML flows in tests/api/: chained HTTP calls ('call: POST /orders'), "
             "values saved with 'save' and reused as ${name}, checks under 'expect' (status, json paths, headers, "
             "schema, time), read-only database checks ('db: SELECT ...' with :params), fixtures and cleanup. "
-            "Use list_environments first, draft_flow for a user story, generate_negative_tests for rejection cases, "
+            "Use list_environments first. For a user story, call review_user_story before anything else: if it has "
+            "questions, ask the user and wait instead of guessing. Then draft_flow; generate_negative_tests for rejection cases, "
             "write_flow to save, run_flows to run. Data-changing calls are refused on environments that don't allow "
             "writes; never put secrets in flows, use ${ENV:NAME}."
         ),
@@ -61,15 +62,42 @@ def create_server() -> FastMCP:
         out["flows"] = [p.relative_to(cfg.root).as_posix() for p in flow_files(cfg.root, None)]
         return out
 
+    @mcp.tool(title="Review a user story")
+    def review_user_story(story: str, context: Optional[str] = None, spec: Optional[str] = None) -> dict:
+        """Call this BEFORE draft_flow. Finds what a careful tester would ask before writing an API test: missing
+        acceptance criteria, outcomes that can't be checked, no user role, untestable words (fast, many), limits
+        without numbers, no failure path, missing preconditions; and for APIs: rejections without a status code or
+        error body, deletes that don't say whether the record is kept, no expected result without credentials or for
+        another user's data, repeated requests with no defined result, and (with a spec) endpoints or fields the spec
+        doesn't have. Returns questions for a person to answer, each with why it matters and the words that raised it.
+        If ready is false, ask the user these questions and wait; do not guess the answers.
+
+        context: related product docs, glossary or notes; terms the story uses but this never explains become questions.
+        spec: OpenAPI/Swagger file to check against (default: the configured spec)."""
+        cfg = config.load(project_root())
+        s = _spec(cfg, spec) if (spec or cfg.spec) else None
+        out = clarify.review(story, context, s)
+        out["next"] = ("No open questions. Continue with draft_flow." if out["ready"] else
+                       "Ask the user these questions and wait for answers. Add the answers to the story "
+                       "(as acceptance criteria or Given/When/Then), then call review_user_story again.")
+        return out
+
     @mcp.tool(title="Draft flow from a user story")
     def draft_flow(story: str, spec: Optional[str] = None) -> dict:
         """Turn a user story or acceptance criteria into scenarios, the spec operations most likely involved, and a
-        flow skeleton to complete (chain IDs with save/${...}, add value and db checks)."""
+        flow skeleton to complete (chain IDs with save/${...}, add value and db checks). Call review_user_story first;
+        the result includes a short review so open questions are never silently skipped."""
         cfg = config.load(project_root())
         s = None
         if spec or cfg.spec:
             s = _spec(cfg, spec)
-        return generate.draft(story, s)
+        out = generate.draft(story, s)
+        r = clarify.review(story, None, s)
+        out["review"] = {"ready": r["ready"], "open_questions": len(r["questions"])}
+        if not r["ready"]:
+            out["review"]["note"] = ("This story has open questions; call review_user_story and ask the user before "
+                                     "completing the flow.")
+        return out
 
     @mcp.tool(title="Generate negative tests")
     def generate_negative_tests(endpoint: str, spec: Optional[str] = None, base_values: Optional[dict] = None,
