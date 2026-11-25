@@ -1,0 +1,201 @@
+{
+  "about": "Shared review_user_story cases. Generated from k11 Playwright QA's implementation; both Playwright QA and Selenium QA must produce exactly these questions.",
+  "cases": [
+    {
+      "name": "clear story",
+      "story": "As a registered customer, I want to sign in so that I can see my orders.\n\nScenario: Valid credentials show the dashboard\n  Given I am on the login page\n  When I sign in with valid credentials\n  Then I see \"Welcome back\"\n\nScenario: Wrong password shows an error\n  Given I am on the login page\n  When I sign in with a wrong password\n  Then I see an error message",
+      "expect": {
+        "ready": true,
+        "questions": []
+      }
+    },
+    {
+      "name": "one-line wish",
+      "story": "I want the search to be fast and easy to use.",
+      "expect": {
+        "ready": false,
+        "questions": [
+          {
+            "kind": "criteria",
+            "question": "What are the acceptance criteria? List what must be true for this story to be done."
+          },
+          {
+            "kind": "role",
+            "question": "Who is the user: a visitor, a signed-in customer, an admin? Does anyone else get different behaviour?"
+          },
+          {
+            "kind": "vague-term",
+            "question": "\"fast\" can't be tested as written. What is the measurable version (a number, a time, a specific behaviour)?",
+            "quote": "I want the search to be fast and easy to use."
+          },
+          {
+            "kind": "vague-term",
+            "question": "\"easy\" can't be tested as written. What is the measurable version (a number, a time, a specific behaviour)?",
+            "quote": "I want the search to be fast and easy to use."
+          }
+        ]
+      }
+    },
+    {
+      "name": "vague outcome, asked once",
+      "story": "As a shopper, I want to apply a discount code.\nScenario: code applies\n  Given I have items in my cart\n  When I enter a valid code\n  Then the discount works correctly\nScenario: bad code\n  Given I have items in my cart\n  When I enter an invalid code\n  Then I see \"Code not recognised\"",
+      "expect": {
+        "ready": false,
+        "questions": [
+          {
+            "kind": "outcome",
+            "question": "In \"code applies\", what exactly shows that it worked: a message, a page, a value, an email?",
+            "quote": "Then the discount works correctly"
+          }
+        ]
+      }
+    },
+    {
+      "name": "limit without a number",
+      "story": "As an admin, I want to invite teammates.\nScenario: invite sent\n  Given I am signed in as an admin\n  When I invite a teammate by email\n  Then I see \"Invitation sent\"\nScenario: invalid email\n  Given I am signed in as an admin\n  When I invite \"not-an-email\"\n  Then I see an error message\nInvitations expire after a while.",
+      "expect": {
+        "ready": false,
+        "questions": [
+          {
+            "kind": "limit",
+            "question": "What is the actual number for this limit, and what happens exactly at it and one past it?",
+            "quote": "Invitations expire after a while."
+          }
+        ]
+      }
+    },
+    {
+      "name": "limit with a number",
+      "story": "As a registered customer, I want to sign in so that I can see my orders.\n\nScenario: Valid credentials show the dashboard\n  Given I am on the login page\n  When I sign in with valid credentials\n  Then I see \"Welcome back\"\n\nScenario: Wrong password shows an error\n  Given I am on the login page\n  When I sign in with a wrong password\n  Then I see an error message\nAccounts lock after 5 attempts.",
+      "expect": {
+        "ready": true,
+        "questions": []
+      }
+    },
+    {
+      "name": "happy path only",
+      "story": "As a customer, I want to download my invoice.\nScenario: download\n  Given I have a paid order\n  When I click \"Download invoice\"\n  Then a PDF downloads",
+      "expect": {
+        "ready": false,
+        "questions": [
+          {
+            "kind": "failure-path",
+            "question": "What should happen when it goes wrong: invalid input, no permission, an expired session, a server error?"
+          }
+        ]
+      }
+    },
+    {
+      "name": "missing precondition",
+      "story": "As a customer, I want to cancel my order.\nScenario: cancel\n  When I cancel my order\n  Then I see \"Order cancelled\"\nScenario: too late\n  Given my order has shipped\n  When I try to cancel it\n  Then I see an error message",
+      "expect": {
+        "ready": false,
+        "questions": [
+          {
+            "kind": "precondition",
+            "question": "In \"cancel\", what is the starting state: who is signed in, and what data already exists?"
+          }
+        ]
+      }
+    },
+    {
+      "name": "no Then",
+      "story": "As a customer, I want to save my address.\nScenario: save\n  Given I am on my profile\n  When I save a new address\nScenario: missing postcode\n  Given I am on my profile\n  When I save an address without a postcode\n  Then I see an error message",
+      "expect": {
+        "ready": false,
+        "questions": [
+          {
+            "kind": "outcome",
+            "question": "In \"save\", what should the user see or what should change at the end?"
+          }
+        ]
+      }
+    },
+    {
+      "name": "undefined term with context",
+      "story": "As a Gold Member, I want free shipping on \"Express Plus\" orders.\n- Gold Member orders over $50 show free shipping at checkout\n- Orders without membership show the standard shipping price",
+      "context": "Gold Member: customers who spent over $500 last year.",
+      "expect": {
+        "ready": false,
+        "questions": [
+          {
+            "kind": "failure-path",
+            "question": "What should happen when it goes wrong: invalid input, no permission, an expired session, a server error?"
+          },
+          {
+            "kind": "undefined-term",
+            "question": "What does \"Express Plus\" mean here? The context provided doesn't mention it.",
+            "quote": "Express Plus"
+          }
+        ]
+      }
+    },
+    {
+      "name": "answered story (0.4.1 fix)",
+      "story": "As a signed-in shopper, I want to apply a discount code at checkout.\nScenario: valid code\n  Given I have a cart worth $80\n  When I apply the code SAVE10\n  Then I see \"Discount: -$8.00\"\nScenario: expired code\n  Given I have a cart worth $80\n  When I apply a code that expired 31 days ago\n  Then I see \"This code has expired\"",
+      "expect": {
+        "ready": true,
+        "questions": []
+      }
+    },
+    {
+      "name": "quoted UI text is not questioned",
+      "story": "As a registered customer, I want to sign in so that I can see my orders.\n\nScenario: Valid credentials show the dashboard\n  Given I am on the login page\n  When I sign in with valid credentials\n  Then I see \"Fast checkout is ready\"\n\nScenario: Wrong password shows an error\n  Given I am on the login page\n  When I sign in with a wrong password\n  Then I see an error message",
+      "expect": {
+        "ready": true,
+        "questions": []
+      }
+    },
+    {
+      "name": "the same word as a requirement is",
+      "story": "As a registered customer, I want to sign in so that I can see my orders.\n\nScenario: Valid credentials show the dashboard\n  Given I am on the login page\n  When I sign in with valid credentials\n  Then I see \"Fast checkout is ready\"\n\nScenario: Wrong password shows an error\n  Given I am on the login page\n  When I sign in with a wrong password\n  Then I see an error message\nCheckout must be fast.",
+      "expect": {
+        "ready": false,
+        "questions": [
+          {
+            "kind": "vague-term",
+            "question": "\"fast\" can't be tested as written. What is the measurable version (a number, a time, a specific behaviour)?",
+            "quote": "Checkout must be fast."
+          }
+        ]
+      }
+    },
+    {
+      "name": "demo: vague checkout story",
+      "story": "As a shopper, I want checkout to be fast and easy.\n- Discount codes apply at checkout\n- Codes expire after a while",
+      "expect": {
+        "ready": false,
+        "questions": [
+          {
+            "kind": "vague-term",
+            "question": "\"fast\" can't be tested as written. What is the measurable version (a number, a time, a specific behaviour)?",
+            "quote": "As a shopper, I want checkout to be fast and easy."
+          },
+          {
+            "kind": "vague-term",
+            "question": "\"easy\" can't be tested as written. What is the measurable version (a number, a time, a specific behaviour)?",
+            "quote": "As a shopper, I want checkout to be fast and easy."
+          },
+          {
+            "kind": "limit",
+            "question": "What is the actual number for this limit, and what happens exactly at it and one past it?",
+            "quote": "Codes expire after a while"
+          }
+        ]
+      }
+    },
+    {
+      "name": "acceptance-criteria bullets",
+      "story": "Title: Password reset\nAcceptance criteria:\n- A reset link is sent to registered emails\n- Unknown emails show the same confirmation message\nAC3: The link expires after 30 minutes",
+      "expect": {
+        "ready": false,
+        "questions": [
+          {
+            "kind": "role",
+            "question": "Who is the user: a visitor, a signed-in customer, an admin? Does anyone else get different behaviour?"
+          }
+        ]
+      }
+    }
+  ]
+}

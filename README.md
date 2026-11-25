@@ -6,6 +6,7 @@
 
 Contract checks tell you an API still has the right *shape*. They don't tell you whether placing an order charges the right amount, whether cancelling really soft-deletes the row, or whether a malformed request crashes the server. This MCP server lets Claude (or any MCP client) write and run those tests with you:
 
+- **Ask before you build.** Before drafting a flow, `review_user_story` lists what a careful tester would ask: a rejection with no status code, a delete that doesn't say whether the row is kept, no expected result without credentials, an endpoint or field the spec doesn't have. The agent stops and asks instead of guessing.
 - **User story → multi-step test flow.** Chain calls (`POST /orders` → save the `id` → `GET /orders/{id}` → `DELETE`) with readable YAML and value checks.
 - **Database checks in the same flow.** After the API call, check the row really changed: `SELECT status, deleted_at FROM orders WHERE id = :orderId`. Read-only by default, with masked columns.
 - **Negative and boundary tests from the spec,** including nested fields and array items: missing required fields, wrong types, values outside enums and min/max/length limits, no credentials, unknown IDs. Every case must get a 4xx, **never a 5xx**.
@@ -67,12 +68,47 @@ cleanup:
 - **Variables:** `save` from JSON paths, headers (`header:Location`) or `status`; use them as `${orderId}`. Generators: `${uuid}`, `${random_email}`, `${random_int}`, `${now}`, `${today}`. Secrets: `${ENV:NAME}`.
 - **Failures:** a step that only fails value checks lets the flow continue, to gather more evidence. A wrong status, a 5xx, a blocked write or a missing saved value stops it. `continue_on_failure: true` runs every step (generated negative suites use it). Cleanup always runs.
 
+## Ask before you build
+
+Generating a flow from an unclear story doesn't remove the ambiguity; it hides it in the YAML, as guessed status codes,
+guessed database checks and guessed error bodies. So `/api-functional-qa:api-story-test` starts with `review_user_story`,
+and if the story has gaps the agent asks you and waits:
+
+```text
+As a customer, I want to cancel an order.
+Given I have an order
+When I send DELETE /refunds/{id}
+Then it is removed
+```
+
+> - **failure-path:** What should happen when it goes wrong: invalid input, no permission, an expired session, a server error?
+> - **delete-semantics:** When it's deleted or cancelled, is the record removed (hard delete) or kept and marked (soft delete: which status or column)? And what does GET return for it afterwards?
+> - **access:** The story is for a customer. What should happen without credentials, and when one user calls with another user's IDs: 401, 403 or 404?
+> - **spec-mismatch:** The story mentions DELETE /refunds/{id}, but the spec has no such operation. Is the spec out of date, or should the flow use a different endpoint?
+
+Each question says why it matters and quotes the words that raised it. The rules are deterministic, and there are two sets:
+
+- **Shared with [k11 Playwright QA](https://github.com/K11-Software-Solutions/k11techlab-playwright-qa-mcp) and [k11 Selenium QA](https://github.com/K11-Software-Solutions/k11techlab-selenium-qa-mcp):** missing acceptance criteria, outcomes that can't be checked, no role, untestable words, limits without numbers, no failure path, missing preconditions, and (with `context`) terms the context never explains. All three repositories test against the same `tests/fixtures/review_cases.json`.
+- **API-specific:**
+
+  | Kind | Asked when |
+  |---|---|
+  | `error-contract` | Something is rejected, but the outcome gives no 4xx or 5xx status. |
+  | `delete-semantics` | Something is deleted or cancelled, but nothing says whether the record is kept. |
+  | `access` | A signed-in role, but nothing about calls without credentials or on another user's data. |
+  | `repeat` | A repeated or duplicate request, but no defined result. |
+  | `spec-mismatch` | With a spec: an endpoint or field name the spec doesn't have. |
+
+A clear story gets no questions; that's tested too. If you tell the agent to go ahead anyway, each open question goes into
+the flow as a `# OPEN QUESTION:` comment and into the final report.
+
 ## Tools
 
 | Tool | What it does |
 |---|---|
 | `list_environments` | Environments and whether each allows writes (and why), auth profiles, databases, fixtures, flows. |
-| `draft_flow` | User story → scenarios, the spec operations most likely involved, and a flow skeleton. |
+| `review_user_story` | Questions to answer before writing a flow, checked against the spec; `ready: false` means ask, don't guess. |
+| `draft_flow` | User story → scenarios, the spec operations most likely involved, a flow skeleton, and a review summary. |
 | `generate_negative_tests` | Negative and boundary cases for one operation, with real base values from fixtures. |
 | `write_flow` | Validates and saves a flow under `tests/api/`. |
 | `run_flows` | Runs flows (all, by path or by tag) with full evidence and reports. |
@@ -161,7 +197,7 @@ Not covered: load testing (use k6 or Gatling) and deep fuzzing (use Schemathesis
 
 ```bash
 python -m venv .venv && .venv/Scripts/pip install -e ".[dev]"   # bin/pip on macOS/Linux
-pytest   # values, guardrails, flows against the demo shop, negative tests, export, CLI, MCP (25)
+pytest   # values, guardrails, flows against the demo shop, negative tests, export, CLI, MCP, story review (51)
 ```
 
 ## Roadmap
