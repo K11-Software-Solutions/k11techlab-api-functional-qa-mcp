@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.1 (26 November 2026)
+
+- **Fix:** the `repeat` question fired on any "already", so "Cancelling is rejected when it already shipped" got a question about duplicate requests, and that hid the `error-contract` question the story needed. "Already" now counts only when it says the request was made before ("already registered", "already used", "already exists"), not when it describes the record's state. Found in the 0.2.0 live check; covered by a regression test.
+
 ## 0.2.0 (25 November 2026): ask before you build
 
 - **Ask before you build:** new `review_user_story` tool. Before a flow is drafted, it lists the questions a careful tester would ask, each with why it matters and the words that raised it. If there are any, the agent asks you and waits instead of guessing.
