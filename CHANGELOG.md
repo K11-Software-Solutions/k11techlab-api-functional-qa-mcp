@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.2 (26 November 2026)
+
+- **Fix:** `review_user_story` asked "What should happen when it goes wrong?" about stories that already describe a rejection, such as "Cancelling is rejected when it already shipped". The failure-path rule now also counts "rejected"/"rejects", "refused"/"refuses", "declined", "disallowed" and "blocked" as failure words. The same rules ship in k11 Playwright QA 0.4.2 and k11 Selenium QA 0.3.1; the shared `tests/fixtures/review_cases.json` has a new case for it. Found in the 0.2.1 live check.
+
 ## 0.2.1 (26 November 2026)
 
 - **Fix:** the `repeat` question fired on any "already", so "Cancelling is rejected when it already shipped" got a question about duplicate requests, and that hid the `error-contract` question the story needed. "Already" now counts only when it says the request was made before ("already registered", "already used", "already exists"), not when it describes the record's state. Found in the 0.2.0 live check; covered by a regression test.
