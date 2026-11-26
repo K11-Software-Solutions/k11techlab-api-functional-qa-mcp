@@ -104,6 +104,18 @@ def test_repeat_without_a_defined_result_is_asked_once():
     assert "repeat" not in kinds(raw.replace("it is refused", "I get 409"))
 
 
+def test_already_describing_a_state_is_not_a_repeat():
+    # Found in the 0.2.0 live check: "already shipped" is the order's state, not a repeated request, and the
+    # repeat question hid the error-contract question this story really needs.
+    raw = "As a customer, I want to cancel an order.\n- Cancelling is rejected when it already shipped"
+    ks = kinds(raw)
+    assert "repeat" not in ks and "error-contract" in ks
+    for text in ("Registering is refused when the email is already registered",
+                 "Applying a code is refused when it was already used",
+                 "Registering when an account already exists is refused"):
+        assert "repeat" in kinds(f"As a visitor, I want to register.\n- {text}"), text
+
+
 def test_spec_mismatch_for_unknown_endpoints_and_fields(spec):
     raw = ("As a visitor, I want to register.\nGiven no account exists\n"
            "When I send POST /signup with `nickname` and customerId\nThen I get 201")

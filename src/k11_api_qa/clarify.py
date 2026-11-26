@@ -231,7 +231,11 @@ DELETION = re.compile(r"\b(delete[sd]?|deletion|remove[sd]?|removal|cancel(s|led
 DELETION_DEFINED = re.compile(r"\b(soft|hard|permanent(ly)?|status|deleted_at|kept|keeps|marked|flag(ged)?|row|rows|database|db|purge[sd]?|gone)\b", re.I)
 PUBLIC_ROLES = re.compile(r"\b(visitor|guest|anonymous|public|anyone)\b", re.I)
 ACCESS_DEFINED = re.compile(r"\b(401|403|unauthori[sz]ed|forbidden|without (a |an |any )?(token|credentials|api key|key|auth\w*|signing in|logging in|login)|not (signed|logged) in|signed out|logged out|another (customer|user|account|tenant)|other (customer|user|account)s?'s|someone else'?s?)\b", re.I)
-REPEAT = re.compile(r"\b(twice|again|duplicates?|duplicated|already|more than once|only once|a second time|same (email|request|order|code|payment|key|id|name))\b", re.I)
+# "already" only counts when it says the request was made before ("already registered"), not for a state of
+# the record ("already shipped", "already cancelled"), which is a precondition, not a repeated request.
+REPEAT = re.compile(r"\b(twice|again|duplicates?|duplicated|more than once|only once|a second time"
+                    r"|already (exists?|registered|used|taken|in use|submitted|sent|paid|redeemed|applied|claimed|subscribed|booked|has an account)"
+                    r"|same (email|request|order|code|payment|key|id|name))\b", re.I)
 ENDPOINT = re.compile(r"\b(GET|POST|PUT|PATCH|DELETE)\s+(/[\w\-./{}:]*)")
 BACKTICKED = re.compile(r"`([A-Za-z_][\w.\[\]]*)`")
 CAMEL = re.compile(r"\b([a-z]+(?:[A-Z][a-z0-9]*)+)\b")
