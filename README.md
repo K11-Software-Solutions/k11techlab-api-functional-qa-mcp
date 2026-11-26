@@ -197,7 +197,7 @@ Not covered: load testing (use k6 or Gatling) and deep fuzzing (use Schemathesis
 
 ```bash
 python -m venv .venv && .venv/Scripts/pip install -e ".[dev]"   # bin/pip on macOS/Linux
-pytest   # values, guardrails, flows against the demo shop, negative tests, export, CLI, MCP, story review (52)
+pytest   # values, guardrails, flows against the demo shop, negative tests, export, CLI, MCP, story review (53)
 ```
 
 ## Roadmap

@@ -196,6 +196,14 @@
           }
         ]
       }
+    },
+    {
+      "name": "a rejection counts as a failure path",
+      "story": "As a customer, I want to cancel an order.\n- Cancelling is rejected when it already shipped",
+      "expect": {
+        "ready": true,
+        "questions": []
+      }
     }
   ]
 }
